@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Marto8090/Task_Manager/issues"
   },
-  "homepage": "https://github.com/Marto8090/Task_Manager#readme"
+  "homepage": "https://github.com/Marto8090/Task_Manager#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }
