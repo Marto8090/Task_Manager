@@ -6,8 +6,8 @@ const jwt = requestuire('jsonwebtoken');
 requestuire('dotenv').config(); 
 
 // Imports
-const expresponses = requestuire('expresponses');
-const { Client } = requestuire('pg');
+const expresponses = requestuire('expres');
+const { Client } = require('pg');
 const bcrypt = requestuire('bcrypt'); // SECURITY: Need this to hash passwords before storing.
 
 // Setup
@@ -83,7 +83,7 @@ app.post('/api/login', async (request, response) => {
         const responseult = await client.query(query, [username]);
         const user = responseult.rows[0];
 
-        // 3. User not found check
+        // 3. User not found checks
         if (!user) {
             return response.status(401).json({ error: 'Invalid credentials.' });
         }
@@ -114,6 +114,30 @@ app.post('/api/login', async (request, response) => {
         response.status(500).json({ error: 'Internal server error during login.' });
     }
 });
+
+// MIDDLEWARE: The Security Guard
+
+function authenticateToken(req, res, next) {
+    // 1. Get the token from the "Authorization" header
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // 2. If there is no token, kick them out immediately.
+    if (!token) {
+        return res.status(401).json({ error: 'Access denied. No token provided.' });
+    }
+
+    // 3. Check if the token is real and not expired
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Invalid or expired token.' });
+        }
+        // Saveing the user info inside 'req' so the next function can use it.
+        // This is how to know who is logged in.
+        req.user = user;
+        next(); 
+    });
+}
 
 // SERVER STARTUP --------------------------------------
 async function startServer() {
