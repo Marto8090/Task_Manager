@@ -53,7 +53,7 @@ router.post('/tasks', async (request, response) => {
 });
 
 // 2. Get Tasks for a specific Client (GET /api/tasks?client_id=X)
-router.get('/tasks', async(request ,response) => {
+router.get('/tasks', async(request, response) => {
 
     const { client_id } = request.query;
 
@@ -83,5 +83,60 @@ router.get('/tasks', async(request ,response) => {
         response.status(500).json({error: 'Server error'})
     }
 });
+
+// 3. Update a Task (PUT /api/tasks/:id)   :id used as placeholder
+router.put('/tasks/:id', async(request, response) => {
+    const { id } = request.params; // Getting the ID number from the URL
+    const { status, description, priority } = request.body // Getting the new data
+
+    try{
+        // 1. Does this task exist? 
+        // 2. Does it belong to the logged-in user?
+        const verifyTask = await client.query(
+            'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
+            [id, request.user.userId]
+        );
+
+        if(verifyTask.rows.length === 0){
+            return response.status(403).json({ error: 'Access denied to this client.' })
+        };
+        // UPDATING THE DATABASE
+        // using COALESCE so if I don't send a new value, it keeps the old one.
+        const query = ` UPDATE tasks SET status = COALESCE($1, status), description = COALESCE($2, description),
+                        priority = COALESCE($3, priority) WHERE id = $4 AND user_id = $5 RETURNING *; `;
+
+        const result = await client.query(query, [status, description, priority, id, request.user.userId]);
+
+        response.json({message: 'Task updated!', task: result.rows[0] });
+    }
+    catch(error){
+        console.error('Error updating task:', error);
+        response.status(500).json({ error: 'Server error' });
+    }
+});
+
+// 4. Delete a Task (DELETE /api/tasks/:id)
+router.delete('/tasks/:id', async (request, response) => {
+    const { id } = request.params;
+
+    try {
+        // Only deleting if it belongs to the user
+        const result = await client.query(
+            'DELETE FROM tasks WHERE id = $1 AND user_id = $2 RETURNING *',
+            [id, request.user.userId]
+        );
+
+        if (result.rows.length === 0) {
+            return response.status(404).json({ error: 'Task not found or not yours.' });
+        }
+
+        response.json({ message: 'Task deleted successfully.' });
+
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        response.status(500).json({ error: 'Server error' });
+    }
+});
+
 
 module.exports = router;
