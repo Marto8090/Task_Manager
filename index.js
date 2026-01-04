@@ -10,12 +10,14 @@ app.use(express.json());
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
 const clientRoutes = require('./routes/clientRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 // Mount Routes
 // Any route in auth.js will start with /api
 app.use('/api', authRoutes); 
 
-// Any route in clients.js will start with /api/clients
-app.use('/api/clients', clientRoutes);
+app.use('/api', clientRoutes);
+
+app.use('/api', taskRoutes); 
 
 // Base Route
 app.get('/', (req, res) => {
