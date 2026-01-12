@@ -3,9 +3,10 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-
 // Middleware
 app.use(express.json());
+
+app.use(express.static('public'));
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
@@ -18,11 +19,6 @@ app.use('/api', authRoutes);
 app.use('/api', clientRoutes);
 
 app.use('/api', taskRoutes); 
-
-// Base Route
-app.get('/', (req, res) => {
-  res.send('Task Manager API is running!');
-});
 
 // Start Server
 app.listen(port, () => {
