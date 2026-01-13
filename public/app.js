@@ -1,17 +1,20 @@
 const API_URL = 'http://localhost:3000/api';
 
 // DOM Elements
-const authScreen = document.getElementById('auth-screen');
-const dashboardScreen = document.getElementById('dashboard-screen');
 const authForm = document.getElementById('auth-form');
 const formTitle = document.getElementById('form-title');
 const authBtn = document.getElementById('auth-btn');
 const toggleAuth = document.getElementById('toggle-auth');
 const errorMsg = document.getElementById('error-msg');
 
-let isLoginMode = false; //start in "Sign Up" mode
+let isLoginMode = false;
 
-// 1. Toggling between Login and Sign Up
+// 1. Check if already logged in
+if (localStorage.getItem('token')) {
+    window.location.href = 'dashboard.html'; // <--- REDIRECT
+}
+
+// 2. Toggle Login/Signup
 toggleAuth.addEventListener('click', () => {
     isLoginMode = !isLoginMode;
     if (isLoginMode) {
@@ -26,12 +29,11 @@ toggleAuth.addEventListener('click', () => {
     errorMsg.innerText = '';
 });
 
-// 2. Handling Form Submit
-authForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
+// 3. Handle Submit
+authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-
     const endpoint = isLoginMode ? '/login' : '/register';
     
     try {
@@ -40,16 +42,13 @@ authForm.addEventListener('submit', async (event) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-
         const data = await response.json();
 
         if (response.ok) {
             if (isLoginMode) {
-                // Saving the token
                 localStorage.setItem('token', data.token);
-                showDashboard();
+                window.location.href = 'dashboard.html'; // <--- REDIRECT
             } else {
-                // If registered switching to login automatically
                 alert('Account created! Please login.');
                 toggleAuth.click(); 
             }
@@ -57,22 +56,6 @@ authForm.addEventListener('submit', async (event) => {
             errorMsg.innerText = data.error;
         }
     } catch (err) {
-        errorMsg.innerText = 'Server error';
+        errorMsg.innerText = 'Server error.';
     }
-});
-
-// 3. Show Dashboard
-function showDashboard() {
-    authScreen.classList.add('hidden');
-    dashboardScreen.classList.remove('hidden');
-}
-
-if (localStorage.getItem('token')) {
-    showDashboard();
-}
-
-// Logout logic
-document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    location.reload();
 });

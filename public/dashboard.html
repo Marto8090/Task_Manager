@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks - Accountant Task Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="dashboard-layout">
+        <header class="dash-header">
+            <div class="header-spacer">
+                <button id="logout-btn" style="background:none; border:none; color: #555; cursor:pointer;">Logout</button>
+            </div>
+            <h1>Tasks</h1>
+            <button id="create-task-btn" class="header-btn">Create Task</button>
+        </header>
+
+        <div class="dash-body">
+            <aside class="sidebar">
+                <div class="filter-section">
+                    <div class="filter-header">Filter</div>
+                    <ul>
+                        <li class="active-filter">All Tasks</li>
+                        <li>By Client</li>
+                        <li>Due Date</li>
+                        <li>Completed</li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <button id="view-clients-btn">View Clients</button>
+                </div>
+            </aside>
+
+            <main class="task-list-container" id="task-list">
+                <p style="text-align:center; margin-top:50px; color:#666;">Loading tasks...</p>
+            </main>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
