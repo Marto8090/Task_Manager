@@ -1,11 +1,6 @@
-/* General Reset */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+/* AUTH PAGE STYLES (Login / Sign Up) */
 
-body { height: 100vh; overflow: hidden; }
-
-.hidden { display: none !important; }
-
-/* split screen layout */
+/* Split Screen Layout */
 .split-screen {
     display: flex;
     height: 100%;
@@ -15,26 +10,27 @@ body { height: 100vh; overflow: hidden; }
 .left-pane {
     width: 65%;
     background-color: #e0e0e0;
-    object-position: center;
     position: relative;
-}
-
-.left-pane::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0; /* Anchors it to the right edge (the middle of the screen) */
-    bottom: 0;
-    width: 25%; /* Controls how "long" the fade is. Try 15% or 30% too! */
-    background: linear-gradient(to right, transparent, white);
-    pointer-events: none; /* Allows clicks to pass through (good practice) */
 }
 
 .left-pane img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(100%); /* Make image Black and White */
+    object-position: center;
+    filter: grayscale(100%);
+}
+
+/* The Gradient Fade Effect */
+.left-pane::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 25%;
+    background: linear-gradient(to right, transparent, white);
+    pointer-events: none;
 }
 
 .right-pane {
@@ -45,6 +41,7 @@ body { height: 100vh; overflow: hidden; }
     background-color: white;
 }
 
+/* Auth Form Styling */
 .auth-container {
     width: 320px;
     text-align: center;
@@ -63,25 +60,18 @@ h2 {
     color: #000;
 }
 
-label {
-    display: block;
-    text-align: left;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #333;
-}
-
-input {
+/* Specific Inputs for Auth */
+.auth-container input {
     width: 100%;
     padding: 12px;
     margin-bottom: 24px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
-    background: #fff;
 }
 
-button {
+/* Specific Button for Auth */
+.auth-container button {
     width: 100%;
     padding: 12px;
     background-color: #D9D9D9; 
@@ -93,7 +83,7 @@ button {
     transition: 0.2s;
 }
 
-button:hover {
+.auth-container button:hover {
     background-color: #bfaeae;
 }
 

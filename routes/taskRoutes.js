@@ -52,35 +52,42 @@ router.post('/tasks', async (request, response) => {
     }
 });
 
-// 2. Get Tasks for a specific Client (GET /api/tasks?client_id=X)
-router.get('/tasks', async(request, response) => {
+// 2. Get Tasks (GET /api/tasks OR /api/tasks?client_id=X)
+router.get('/tasks', async (req, res) => {
+    const { client_id } = req.query;
+    const userId = req.user.userId;
 
-    const { client_id } = request.query;
+    try {
+        let query;
+        let values;
 
-    if(!client_id){
-        return response.status(400).json({ error: 'Please provide a ?client_id= number.' });
-    }
+        // Scenario 1: Filter by specific client
+        if (client_id) {
+            // Security: Check if client belongs to user
+            const verifyClient = await client.query(
+                'SELECT * FROM clients WHERE id = $1 AND user_id = $2',
+                [client_id, userId]
+            );
+            
+            if (verifyClient.rows.length === 0) {
+                return res.status(403).json({ error: 'Access denied to this client.' });
+            }
 
-    try{
-        // SECURITY CHECK 
-        const verifyClient = await client.query(
-            'SELECT * FROM clients WHERE id = $1 AND user_id = $2',
-            [client_id, request.user.userId]
-        );
-        if(verifyClient.rows.length === 0){
-            return response.status(403).json({ error: 'Access denied to this client.' })
+            query = 'SELECT * FROM tasks WHERE client_id = $1 AND user_id = $2 ORDER BY created_at DESC';
+            values = [client_id, userId];
+
+        } else {
+            // Scenario 2: Get ALL tasks for this user
+            query = 'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC';
+            values = [userId];
         }
 
-        const result = await client.query(
-            'SELECT * FROM tasks WHERE client_id = $1 ORDER BY created_at DESC',
-            [client_id]
-        )
+        const result = await client.query(query, values);
+        res.json(result.rows);
 
-        response.status(201).json(result.rows);
-
-    } catch(error){
+    } catch (error) {
         console.error('Error fetching tasks:', error);
-        response.status(500).json({error: 'Server error'})
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
