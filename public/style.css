@@ -13,8 +13,21 @@ body { height: 100vh; overflow: hidden; }
 }
 
 .left-pane {
-    width: 50%;
+    width: 65%;
     background-color: #e0e0e0;
+    object-position: center;
+    position: relative;
+}
+
+.left-pane::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0; /* Anchors it to the right edge (the middle of the screen) */
+    bottom: 0;
+    width: 25%; /* Controls how "long" the fade is. Try 15% or 30% too! */
+    background: linear-gradient(to right, transparent, white);
+    pointer-events: none; /* Allows clicks to pass through (good practice) */
 }
 
 .left-pane img {
@@ -25,7 +38,7 @@ body { height: 100vh; overflow: hidden; }
 }
 
 .right-pane {
-    width: 50%;
+    width: 35%;
     display: flex;
     justify-content: center;
     align-items: center;
