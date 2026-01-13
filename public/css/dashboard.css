@@ -13,32 +13,37 @@
     height: 70px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-between; /* Pushes items to edges */
     padding: 0 30px;
     border-bottom: 1px solid #999;
-    flex-shrink: 0; 
+    position: relative; /* Helps with absolute centering if needed */
 }
 
+/* Fix the Title centering */
 .dash-header h1 {
     font-size: 32px;
     font-weight: 400;
-    position: absolute;
+    margin: 0;
+    position: absolute; /* Force absolute center */
     left: 50%;
     transform: translateX(-50%);
-    margin: 0;
 }
 
+/* Fix the Button size & position */
 .header-btn {
-    background-color: #757575;
+    width: auto; /* STOP it from taking full width */
+    background-color: #757575; 
     color: white;
     padding: 10px 25px;
     font-size: 16px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    z-index: 10;
+    
+    /* Force it to the right */
+    margin-left: auto; 
+    display: block;
 }
-
 /* Body */
 .dash-body {
     display: flex;

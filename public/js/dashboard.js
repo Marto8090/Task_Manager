@@ -20,7 +20,7 @@ if (createTaskBtn) {
 
 if (viewClientsBtn) {
     viewClientsBtn.addEventListener('click', () => {
-        window.location.href = 'clients.html'; // We will build this next!
+        window.location.href = 'clients.html';
     });
 }
 
@@ -64,10 +64,10 @@ function renderTasks(tasks) {
         return;
     }
 
-    taskListContainer.innerHTML = ''; // Clear "Loading..." text
+    taskListContainer.innerHTML = '';
 
     tasks.forEach(task => {
-        // Convert SQL date to readable string (e.g., "Oct 25")
+        // Convert SQL date to readable string ("Oct 25")
         const dateObj = new Date(task.due_date);
         const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         
@@ -79,7 +79,7 @@ function renderTasks(tasks) {
             <div class="task-card">
                 <div class="card-left">
                     <h3>${task.title}</h3>
-                    <p class="client-name" style="font-size:12px; color:#666;">Client ID: ${task.client_id}</p>
+                    <p class="client-name" style="font-size:12px; color:#666;">Client Name: ${task.client_name}</p>
                 </div>
                 <div class="card-right">
                     <span class="due-date">Due: ${dateStr}</span>
@@ -114,5 +114,4 @@ async function deleteTask(taskId) {
     }
 }
 
-// Load tasks immediately when page opens!
 loadTasks();

@@ -73,12 +73,19 @@ router.get('/tasks', async (req, res) => {
                 return res.status(403).json({ error: 'Access denied to this client.' });
             }
 
-            query = 'SELECT * FROM tasks WHERE client_id = $1 AND user_id = $2 ORDER BY created_at DESC';
+            query = `SELECT tasks.*, clients.name AS client_name FROM tasks JOIN clients ON tasks.client_id = clients.id
+                    WHERE tasks.client_id = $1 AND tasks.user_id = $2 ORDER BY tasks.created_at DESC`;
             values = [client_id, userId];
 
         } else {
             // Scenario 2: Get ALL tasks for this user
-            query = 'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC';
+         query = `
+                SELECT tasks.*, clients.name AS client_name 
+                FROM tasks 
+                JOIN clients ON tasks.client_id = clients.id
+                WHERE tasks.user_id = $1 
+                ORDER BY tasks.created_at DESC
+            `;
             values = [userId];
         }
 
