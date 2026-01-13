@@ -1,46 +1,75 @@
 const API_URL = 'http://localhost:3000/api';
 const token = localStorage.getItem('token');
-const taskListContainer = document.getElementById('task-list');
 
-// 1. Security Check: Redirect to login if no token
 if (!token) {
     window.location.href = 'index.html';
 }
 
-// 2. Navigation Logic
+// NAVIGATION
 const createTaskBtn = document.getElementById('create-task-btn');
 const viewClientsBtn = document.getElementById('view-clients-btn');
 const logoutBtn = document.getElementById('logout-btn');
 
-if (createTaskBtn) {
-    createTaskBtn.addEventListener('click', () => {
-        window.location.href = 'create-task.html';
-    });
-}
+if (createTaskBtn) createTaskBtn.addEventListener('click', () => window.location.href = 'create-task.html');
+if (viewClientsBtn) viewClientsBtn.addEventListener('click', () => window.location.href = 'clients.html');
+if (logoutBtn) logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.href = 'index.html';
+});
 
-if (viewClientsBtn) {
-    viewClientsBtn.addEventListener('click', () => {
-        window.location.href = 'clients.html';
-    });
-}
+// --- 🧠 FILTER LOGIC STARTS HERE ---
+const taskListContainer = document.getElementById('task-list');
+const filterItems = document.querySelectorAll('.sidebar li'); // Grab all filter buttons
 
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.href = 'index.html';
-    });
-}
+// We need to store the raw data here so we can re-sort it without re-fetching
+let allTasks = []; 
 
-// 4. Fetch and Render Tasks
+// Add click events to the sidebar filters
+filterItems.forEach(item => {
+    item.addEventListener('click', () => {
+        // 1. Visual update (Grey background)
+        filterItems.forEach(li => li.classList.remove('active-filter'));
+        item.classList.add('active-filter');
+
+        // 2. Apply the Logic
+        const filterName = item.innerText.trim();
+        applyFilter(filterName);
+    });
+});
+
+function applyFilter(filterName) {
+    // Always start with a fresh copy of the data
+    let filtered = [...allTasks]; 
+
+    if (filterName === 'All Tasks') {
+        // Sort Alphabetically by Title (A-Z)
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+    } 
+    else if (filterName === 'By Client') {
+        // Group by Client Name (A-Z)
+        filtered.sort((a, b) => (a.client_name || "").localeCompare(b.client_name || ""));
+    } 
+    else if (filterName === 'Due Date') {
+        // Shortest time first (Oldest dates at top)
+        filtered.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+    } 
+    else if (filterName === 'Completed') {
+        // SHOW ONLY completed tasks (Filter, not just sort)
+        filtered = filtered.filter(t => t.status === 'done' || t.status === 'completed');
+    }
+
+    renderTasks(filtered);
+}
+// --- 🧠 FILTER LOGIC ENDS HERE ---
+
+
+// 4. Fetch Tasks (Updated to store data)
 async function loadTasks(filterClientId = null) {
     taskListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">Loading...</p>';
 
     try {
-        // Build URL (either /tasks or /tasks?client_id=1)
         let url = `${API_URL}/tasks`;
-        if (filterClientId) {
-            url += `?client_id=${filterClientId}`;
-        }
+        if (filterClientId) url += `?client_id=${filterClientId}`;
 
         const response = await fetch(url, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -49,7 +78,12 @@ async function loadTasks(filterClientId = null) {
         if (!response.ok) throw new Error('Failed to fetch tasks');
 
         const tasks = await response.json();
-        renderTasks(tasks);
+        
+        // SAVE DATA globally so filters can use it
+        allTasks = tasks; 
+
+        // Default: Apply "All Tasks" sort immediately
+        applyFilter('All Tasks'); 
 
     } catch (error) {
         console.error(error);
@@ -57,35 +91,38 @@ async function loadTasks(filterClientId = null) {
     }
 }
 
-// 5. Generate HTML for the List
+// 5. Render Tasks (Using Client Name)
 function renderTasks(tasks) {
     if (tasks.length === 0) {
-        taskListContainer.innerHTML = '<p style="text-align:center; color:#666;">No tasks found. Create one!</p>';
+        taskListContainer.innerHTML = '<p style="text-align:center; color:#666;">No tasks found.</p>';
         return;
     }
 
-    taskListContainer.innerHTML = '';
+    taskListContainer.innerHTML = ''; 
 
     tasks.forEach(task => {
-        // Convert SQL date to readable string ("Oct 25")
         const dateObj = new Date(task.due_date);
         const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         
-        // Dynamic Status Color
-        const statusStyle = task.status === 'done' ? 'color:green' : 'color:#555';
+        // Priority Color
+        const priorityClass = task.priority === 'high' ? 'priority-high' : '';
+        const priorityLabel = `(${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)})`; 
 
-        // Create the Card HTML
+        // Status Color
+        const isDone = task.status === 'done' || task.status === 'completed';
+        const statusColor = isDone ? 'color:green' : 'color:black';
+
         const cardHTML = `
             <div class="task-card">
                 <div class="card-left">
                     <h3>${task.title}</h3>
-                    <p class="client-name" style="font-size:12px; color:#666;">Client Name: ${task.client_name}</p>
+                    <p class="client-name">Client: ${task.client_name || 'Unknown'}</p>
                 </div>
                 <div class="card-right">
-                    <span class="due-date">Due: ${dateStr}</span>
-                    <span class="priority ${task.priority}">(${task.priority})</span>
-                    <span class="status" style="${statusStyle}">Status: <b>${task.status}</b></span>
-                    <button onclick="deleteTask(${task.id})" style="background:none; border:none; cursor:pointer;">🗑️</button>
+                    <span>Due: ${dateStr}</span>
+                    <span class="${priorityClass}">${priorityLabel}</span>
+                    <span style="${statusColor}">Status: ${task.status}</span>
+                    <button onclick="deleteTask(${task.id})" style="cursor:pointer; font-size:18px; border:none; background:none;">🗑️</button>
                 </div>
             </div>
         `;
@@ -94,7 +131,7 @@ function renderTasks(tasks) {
     });
 }
 
-// 6. Delete Task Logic
+// 6. Delete Task
 async function deleteTask(taskId) {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
@@ -105,7 +142,7 @@ async function deleteTask(taskId) {
         });
 
         if (response.ok) {
-            loadTasks(); // Refresh the list
+            loadTasks(); 
         } else {
             alert('Could not delete task');
         }
@@ -114,4 +151,5 @@ async function deleteTask(taskId) {
     }
 }
 
+// Start
 loadTasks();
