@@ -108,22 +108,51 @@
 .sidebar li:hover { background-color: rgba(0,0,0,0.05); }
 .active-filter { background-color: #757575 !important; color: white !important; }
 
+/* --- SIDEBAR FOOTER (Bottom Section) --- */
 .sidebar-footer {
-    height: 200px;
-    background-color: #A0A0A0;
-    display: flex;
-    align-items: flex-end;
+    margin-top: auto; 
     padding: 20px;
+    display: flex;
+    flex-direction: column; 
+    gap: 15px; 
+    border-top: 1px solid #ccc; 
+    background-color: #f4f4f4; 
 }
 
-#view-clients-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: black;
-    cursor: pointer;
-    text-align: left;
+/* SHARED BUTTON STYLE (Size & Shape) */
+.nav-btn {
     width: 100%;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+/* 1. "View Clients" & "View Tasks" (The Dark Grey Buttons) */
+.nav-btn:not(.logout-btn) {
+    background-color: #757575; /* Dark Grey matching your screenshot */
+    color: white;
+    border: none;
+}
+
+.nav-btn:not(.logout-btn):hover {
+    background-color: #555;
+}
+
+/* 2. "Logout" Button (The White Button) */
+.logout-btn {
+    background-color: white;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.logout-btn:hover {
+    background-color: #fff0f0; 
+    border-color: #d32f2f;
+    color: #d32f2f;
 }
 
 /* Task Cards */

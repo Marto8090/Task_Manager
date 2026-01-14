@@ -15,8 +15,18 @@ if (localStorage.getItem('token')) {
 }
 
 // 2. Toggle Login/Signup
+// 2. Toggle Login/Signup
 toggleAuth.addEventListener('click', () => {
     isLoginMode = !isLoginMode;
+    
+    // 1. Clear the inputs (The new fix!)
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+
+    // 2. Clear any old errors
+    errorMsg.innerText = '';
+
+    // 3. Update the Text
     if (isLoginMode) {
         formTitle.innerText = 'Login';
         authBtn.innerText = 'Login';
@@ -24,9 +34,8 @@ toggleAuth.addEventListener('click', () => {
     } else {
         formTitle.innerText = 'Sign Up';
         authBtn.innerText = 'Create account';
-        toggleAuth.innerText = 'Existing user? login';
+        toggleAuth.innerText = 'Existing user? Login';
     }
-    errorMsg.innerText = '';
 });
 
 // 3. Handle Submit

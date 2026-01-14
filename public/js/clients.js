@@ -83,7 +83,7 @@ async function expandClientView(clientId) {
     const client = allClients.find(c => c.id === clientId);
     if (!client) return;
 
-    // B. Clear the container (Hides all other clients!)
+    // B. Clear the container 
     clientListContainer.innerHTML = '';
 
     // C. Build the "Big Card" Structure
@@ -107,7 +107,7 @@ async function expandClientView(clientId) {
 
     clientListContainer.appendChild(expandedCard);
 
-    // D. Add Close Button Logic (Returns to list)
+    // D. Add Close Button Logic
     document.getElementById('close-expanded-btn').addEventListener('click', () => {
         const activeFilter = document.querySelector('.sidebar li.active-filter');
         const filterName = activeFilter ? activeFilter.innerText.trim() : 'By Name (A-Z)';
