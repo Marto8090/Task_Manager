@@ -17,11 +17,53 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => {
     window.location.href = 'index.html';
 });
 
-// --- 🧠 FILTER LOGIC STARTS HERE ---
-const taskListContainer = document.getElementById('task-list');
-const filterItems = document.querySelectorAll('.sidebar li'); // Grab all filter buttons
 
-// We need to store the raw data here so we can re-sort it without re-fetching
+const createTaskForm = document.getElementById('create-task-form');
+
+if (createTaskForm) {
+    createTaskForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Get values
+        const title = document.getElementById('task-title').value;
+        const desc = document.getElementById('task-desc').value;
+        const clientId = document.getElementById('client-select').value; 
+        const date = document.getElementById('task-date').value;
+        const priority = document.querySelector('input[name="priority"]:checked').value;
+
+        try {
+            const response = await fetch(`${API_URL}/tasks`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: desc,
+                    client_id: clientId,
+                    due_date: date,
+                    priority: priority 
+                })
+            });
+
+            if (response.ok) {
+                window.location.href = 'dashboard.html';
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Error creating task');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Server error');
+        }
+    });
+}
+
+// FILTER LOGIC 
+const taskListContainer = document.getElementById('task-list');
+const filterItems = document.querySelectorAll('.sidebar li'); 
+
 let allTasks = []; 
 
 // Add click events to the sidebar filters
@@ -38,30 +80,31 @@ filterItems.forEach(item => {
 });
 
 function applyFilter(filterName) {
-    // Always start with a fresh copy of the data
+    // 1. Start with all data
     let filtered = [...allTasks]; 
 
+    // 2. Decide what to SHOW based on the tab
+    if (filterName === 'Completed') {
+        // If we are in "Completed" tab -> SHOW ONLY DONE tasks
+        filtered = filtered.filter(t => t.status === 'done' || t.status === 'completed');
+    } else {
+        // For every other tab (All Tasks, By Client, Due Date) -> SHOW ONLY PENDING tasks
+        filtered = filtered.filter(t => t.status !== 'done' && t.status !== 'completed');
+    }
+
+    // 3. Apply the specific Sorting logic
     if (filterName === 'All Tasks') {
-        // Sort Alphabetically by Title (A-Z)
         filtered.sort((a, b) => a.title.localeCompare(b.title));
     } 
     else if (filterName === 'By Client') {
-        // Group by Client Name (A-Z)
         filtered.sort((a, b) => (a.client_name || "").localeCompare(b.client_name || ""));
     } 
     else if (filterName === 'Due Date') {
-        // Shortest time first (Oldest dates at top)
         filtered.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
-    } 
-    else if (filterName === 'Completed') {
-        // SHOW ONLY completed tasks (Filter, not just sort)
-        filtered = filtered.filter(t => t.status === 'done' || t.status === 'completed');
     }
 
     renderTasks(filtered);
 }
-// --- 🧠 FILTER LOGIC ENDS HERE ---
-
 
 // 4. Fetch Tasks (Updated to store data)
 async function loadTasks(filterClientId = null) {
@@ -82,8 +125,12 @@ async function loadTasks(filterClientId = null) {
         // SAVE DATA globally so filters can use it
         allTasks = tasks; 
 
+        // Check which sidebar item has the 'active-filter' class
+        const activeBtn = document.querySelector('.sidebar li.active-filter');
+        const currentFilter = activeBtn ? activeBtn.innerText.trim() : 'All Tasks';
+
         // Default: Apply "All Tasks" sort immediately
-        applyFilter('All Tasks'); 
+        applyFilter(currentFilter);
 
     } catch (error) {
         console.error(error);
@@ -112,8 +159,12 @@ function renderTasks(tasks) {
         const isDone = task.status === 'done' || task.status === 'completed';
         const statusColor = isDone ? 'color:green' : 'color:black';
 
-        const cardHTML = `
-            <div class="task-card">
+        // If done: Green Check. If not: Grey Outline Check.
+        const checkIcon = isDone ? '✅' : '☑️'; 
+        const checkAction = isDone ? `markPending(${task.id})` : `markComplete(${task.id})`;
+
+      const cardHTML = `
+            <div class="task-card" style="${isDone ? 'opacity: 0.7; background-color: #f0f0f0;' : ''}">
                 <div class="card-left">
                     <h3>${task.title}</h3>
                     <p class="client-name">Client: ${task.client_name || 'Unknown'}</p>
@@ -122,7 +173,14 @@ function renderTasks(tasks) {
                     <span>Due: ${dateStr}</span>
                     <span class="${priorityClass}">${priorityLabel}</span>
                     <span style="${statusColor}">Status: ${task.status}</span>
-                    <button onclick="deleteTask(${task.id})" style="cursor:pointer; font-size:18px; border:none; background:none;">🗑️</button>
+                    
+                    <button onclick="${checkAction}" title="Toggle Status" style="cursor:pointer; font-size:18px; border:none; background:none; margin-right:10px;">
+                        ${checkIcon}
+                    </button>
+
+                    <button onclick="deleteTask(${task.id})" title="Delete Task" style="cursor:pointer; font-size:18px; border:none; background:none;">
+                        🗑️
+                    </button>
                 </div>
             </div>
         `;
@@ -151,5 +209,76 @@ async function deleteTask(taskId) {
     }
 }
 
-// Start
+// 7. Load Clients for Dropdown (Create Task Page)
+async function loadClientsForDropdown() {
+    const clientSelect = document.getElementById('client-select');
+    
+    // Only run this if the dropdown actually exists on the page
+    if (!clientSelect) return; 
+
+    try {
+        const response = await fetch(`${API_URL}/clients`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const clients = await response.json();
+            
+            // Clear current options (except the first "Select..." one)
+            clientSelect.innerHTML = '<option value="">Select a Client...</option>';
+
+            if (clients.length === 0) {
+                 const option = document.createElement('option');
+                 option.text = "No clients found (Create one first!)";
+                 clientSelect.add(option);
+                 return;
+            }
+
+            // Loop through clients and create options
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;       // The ID sends to the DB
+                option.text = client.name;      // The Name shows to the User
+                clientSelect.add(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading clients:', error);
+    }
+}
+
+loadClientsForDropdown();
+
+// 8. Mark Task as Complete
+async function markComplete(taskId) {
+    updateTaskStatus(taskId, 'done');
+}
+
+// 9. Mark Task as Pending (Undo)
+async function markPending(taskId) {
+    updateTaskStatus(taskId, 'pending');
+}
+
+// Helper function to talk to the API
+async function updateTaskStatus(taskId, newStatus) {
+    try {
+        const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (response.ok) {
+            loadTasks(); // Refresh list to see change
+        } else {
+            alert('Error updating status');
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 loadTasks();

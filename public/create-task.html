@@ -33,11 +33,24 @@
                     <label>Due Date</label>
                     <input type="date" id="task-date">
 
-                    <label>Priority</label>
-                    <div style="margin-bottom:20px;">
-                        <input type="radio" name="priority" value="low"> Low
-                        <input type="radio" name="priority" value="medium" checked> Medium
-                        <input type="radio" name="priority" value="high"> High
+                   <label>Priority</label>
+                    <div class="radio-group">
+                        
+                        <label class="radio-option">
+                            <input type="radio" name="priority" value="low"> 
+                            Low
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" name="priority" value="medium" checked> 
+                            Medium
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" name="priority" value="high"> 
+                            High
+                        </label>
+
                     </div>
 
                     <button type="submit" class="header-btn" style="width:100%; font-size:18px;">Create</button>
