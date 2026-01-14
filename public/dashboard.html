@@ -11,14 +11,12 @@
 <body>
 
     <div class="dashboard-layout">
-        <header class="dash-header">
-            <div class="header-spacer"></div>
+       <header class="dash-header">
+            <img src="Images/Logo.png" class="header-logo" alt="Task Manager Logo">
+
             <h1>Tasks</h1>
-            
-            <div class="header-right">
-                <button id="create-task-btn" class="header-btn">Create Task</button>
-                <img src="Images/Logo.png" class="header-logo" alt="Logo">
-            </div>
+
+            <button id="create-task-btn" class="header-btn">Create Task</button>
         </header>
 
         <div class="dash-body">
@@ -29,6 +27,7 @@
                         <li class="active-filter">All Tasks</li>
                         <li>By Client</li>
                         <li>Due Date</li>
+                        <li>Priority</li>
                         <li>Completed</li>
                     </ul>
                 </div>
@@ -45,7 +44,17 @@
             </main>
         </div>
     </div>
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Delete Task?</h3>
+            <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button id="confirm-delete-btn" class="btn-danger">Yes, Delete</button>
+                <button onclick="closeDeleteModal()" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-    <script src="js/dashboard.js"></script>
+<script src="js/dashboard.js"></script>
 </body>
 </html>

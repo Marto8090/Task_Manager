@@ -80,19 +80,14 @@ filterItems.forEach(item => {
 });
 
 function applyFilter(filterName) {
-    // 1. Start with all data
     let filtered = [...allTasks]; 
 
-    // 2. Decide what to SHOW based on the tab
     if (filterName === 'Completed') {
-        // If we are in "Completed" tab -> SHOW ONLY DONE tasks
         filtered = filtered.filter(t => t.status === 'done' || t.status === 'completed');
     } else {
-        // For every other tab (All Tasks, By Client, Due Date) -> SHOW ONLY PENDING tasks
         filtered = filtered.filter(t => t.status !== 'done' && t.status !== 'completed');
     }
 
-    // 3. Apply the specific Sorting logic
     if (filterName === 'All Tasks') {
         filtered.sort((a, b) => a.title.localeCompare(b.title));
     } 
@@ -102,11 +97,21 @@ function applyFilter(filterName) {
     else if (filterName === 'Due Date') {
         filtered.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
     }
+    else if (filterName === 'Priority') {
+        const priorityMap = { 'high': 3, 'medium': 2, 'low': 1 };
+        
+        filtered.sort((a, b) => {
+            const valA = priorityMap[a.priority] || 0;
+            const valB = priorityMap[b.priority] || 0;
+            
+            return valB - valA;
+        });
+    }
 
     renderTasks(filtered);
 }
 
-// 4. Fetch Tasks (Updated to store data)
+// Fetch Tasks
 async function loadTasks(filterClientId = null) {
     taskListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">Loading...</p>';
 
@@ -125,7 +130,7 @@ async function loadTasks(filterClientId = null) {
         // SAVE DATA globally so filters can use it
         allTasks = tasks; 
 
-        // Check which sidebar item has the 'active-filter' class
+      
         const activeBtn = document.querySelector('.sidebar li.active-filter');
         const currentFilter = activeBtn ? activeBtn.innerText.trim() : 'All Tasks';
 
@@ -138,7 +143,7 @@ async function loadTasks(filterClientId = null) {
     }
 }
 
-// 5. RENDER TASKS (With Edit Button)
+// RENDER TASKS 
 function renderTasks(tasks) {
     if (tasks.length === 0) {
         taskListContainer.innerHTML = '<p style="text-align:center; color:#666;">No tasks found.</p>';
@@ -151,44 +156,48 @@ function renderTasks(tasks) {
         const dateObj = new Date(task.due_date);
         const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         
-        // Priority Color
+        // Priority Logic
         let priorityClass = '';
         if (task.priority === 'high') priorityClass = 'priority-high';
         else if (task.priority === 'medium') priorityClass = 'priority-medium';
         else if (task.priority === 'low') priorityClass = 'priority-low';
-        
+
         const priorityLabel = `(${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)})`;
+        
         const isDone = task.status === 'done' || task.status === 'completed';
-        const statusColor = isDone ? 'color:green' : 'color:black';
-        const checkIcon = isDone ? '✅' : '☑️'; 
         const checkAction = isDone ? `markPending(${task.id})` : `markComplete(${task.id})`;
 
-        // We give the card a unique ID (task-card-123) so we can target it later
         const cardHTML = `
-            <div id="task-card-${task.id}" class="task-card" style="${isDone ? 'opacity: 0.7; background-color: #f0f0f0;' : ''}">
-                <div class="card-left">
-                    <h3>${task.title}</h3>
-                    <p class="client-name">Client: ${task.client_name || 'Unknown'}</p>
-                    ${task.description ? `<p style="font-size:12px; color:#555; margin-top:4px;">${task.description}</p>` : ''}
-                </div>
-                <div class="card-right">
+        <div id="task-card-${task.id}" class="task-card" style="${isDone ? 'opacity: 0.7; background-color: #f8f9fa;' : ''}">
+            
+            <div class="card-left">
+                <h3>${task.title}</h3>
+                <p class="client-name" style="margin-bottom:0; margin-top: 4px;">Client: ${task.client_name || 'Unknown Client'}</p>
+            </div>
+            
+            <div class="card-right">
+                <div style="display:flex; gap:15px; align-items:center; margin-right: 20px; font-size: 14px;">
                     <span>Due: ${dateStr}</span>
                     <span class="${priorityClass}">${priorityLabel}</span>
-                    
-                    <button onclick="enableEditMode(${task.id})" style="padding:5px 10px; cursor:pointer; background:#e0e0e0; border:1px solid #999; border-radius:4px; margin-right:10px;">
-                        Edit
-                    </button>
+                </div>
 
-                    <button onclick="${checkAction}" title="Toggle Status" style="cursor:pointer; font-size:18px; border:none; background:none; margin-right:5px;">
-                        ${checkIcon}
+                <div class="card-actions">
+                    <button class="icon-btn" onclick="enableViewMode(${task.id})" title="View Details">
+                        <img src="images/view-icon.png" class="task-icon" alt="View Details">
                     </button>
-
-                    <button onclick="deleteTask(${task.id})" title="Delete Task" style="cursor:pointer; font-size:18px; border:none; background:none;">
-                        🗑️
+                    <button class="icon-btn" onclick="enableEditMode(${task.id})" title="Edit">
+                        <img src="images/edit-icon.png" class="task-icon" alt="Edit">
+                    </button>
+                    <button class="icon-btn" onclick="${checkAction}" title="${isDone ? 'Mark Pending' : 'Mark Complete'}">
+                        <img src="images/completed-icon.png" class="task-icon" alt="Toggle Status">
+                    </button>
+                    <button class="icon-btn" onclick="deleteTask(${task.id})" title="Delete">
+                        <img src="images/delete-icon.png" class="task-icon" alt="Delete">
                     </button>
                 </div>
             </div>
-        `;
+        </div>
+    `;
         
         taskListContainer.innerHTML += cardHTML;
     });
@@ -209,10 +218,10 @@ function enableEditMode(taskId) {
     card.innerHTML = `
         <div style="width:100%; display:flex; flex-direction:column; gap:10px;">
             <input type="text" id="edit-title-${taskId}" value="${task.title}" style="padding:8px; width:100%;">
-            <textarea id="edit-desc-${taskId}" rows="2" style="padding:8px; width:100%;">${task.description || ''}</textarea>
+            <textarea id="edit-desc-${taskId}" rows="6" style="padding:8px; width:100%;">${task.description || ''}</textarea>
             
-            <div style="display:flex; gap:10px; align-items:center;">
-                <input type="date" id="edit-date-${taskId}" value="${dateInputVal}" style="padding:5px;">
+            <div style="display:flex; gap:10px; align-items:center; margin-top: 20px;">
+                <input type="date" id="edit-date-${taskId}" value="${dateInputVal}" style="padding:5px; margin-bottom:0px;" >
                 
                 <select id="edit-priority-${taskId}" style="padding:5px;">
                     <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
@@ -261,31 +270,80 @@ async function saveTaskEdit(taskId) {
     }
 }
 
-// 6. Delete Task
-async function deleteTask(taskId) {
-    if (!confirm('Are you sure you want to delete this task?')) return;
+let taskToDeleteId = null;
+const deleteModal = document.getElementById('delete-modal');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+function deleteTask(taskId) {
+    taskToDeleteId = taskId;      
+    deleteModal.style.display = 'flex'; 
+}
+
+function closeDeleteModal() {
+    taskToDeleteId = null;
+    deleteModal.style.display = 'none';
+}
+
+// Triggered when you click "Yes, Delete" in the modal
+confirmDeleteBtn.addEventListener('click', async () => {
+    if (!taskToDeleteId) return;
 
     try {
-        const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        const response = await fetch(`${API_URL}/tasks/${taskToDeleteId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
-            loadTasks(); 
+            closeDeleteModal(); 
+            loadTasks();        
         } else {
             alert('Could not delete task');
         }
     } catch (err) {
         console.error(err);
     }
+});
+
+function enableViewMode(taskId) {
+    const task = allTasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const card = document.getElementById(`task-card-${taskId}`);
+    
+    const dateObj = new Date(task.due_date);
+    const fullDateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+    const statusLabel = task.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+    card.innerHTML = `
+        <div style="width:100%; display:flex; flex-direction:column; gap:15px; padding: 5px;">
+            <h3 style="margin:0; font-size: 26px; border-bottom: 2px solid #eee; padding-bottom: 10px;">${task.title}</h3>
+            
+           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size: 16px; color:#555;">
+                <div><strong>Client:</strong> ${task.client_name || 'Unknown'}</div>
+                <div><strong>Due Date:</strong> ${fullDateStr}</div>
+                <div><strong>Priority:</strong> <span class="priority-${task.priority}">${priorityLabel}</span></div>
+                <div><strong>Status:</strong> ${statusLabel}</div>
+            </div>
+
+            <div>
+                <strong style="display:block; margin-bottom:5px;">Description:</strong>
+                <div style="background:#fff; padding:15px; border:1px solid #eee; border-radius:6px; white-space: pre-wrap; min-height: 60px; max-height:200px; overflow-y:auto;">${task.description || '<span style="color:#999;">No description provided.</span>'}</div>
+            </div>
+
+            <div style="margin-left:auto; margin-top: 10px;">
+                <button onclick="loadTasks()" style="background:#757575; color:white; border:none; padding:10px 25px; border-radius:4px; cursor:pointer; font-weight:600; font-size:14px;">Close View</button>
+            </div>
+        </div>
+    `;
 }
 
-// 7. Load Clients for Dropdown (Create Task Page)
+// Load Clients for Dropdown (Create Task Page)
 async function loadClientsForDropdown() {
     const clientSelect = document.getElementById('client-select');
     
-    // Only run this if the dropdown actually exists on the page
+   
     if (!clientSelect) return; 
 
     try {
@@ -296,7 +354,7 @@ async function loadClientsForDropdown() {
         if (response.ok) {
             const clients = await response.json();
             
-            // Clear current options (except the first "Select..." one)
+            // Clear current options 
             clientSelect.innerHTML = '<option value="">Select a Client...</option>';
 
             if (clients.length === 0) {
@@ -306,11 +364,11 @@ async function loadClientsForDropdown() {
                  return;
             }
 
-            // Loop through clients and create options
+       
             clients.forEach(client => {
                 const option = document.createElement('option');
-                option.value = client.id;       // The ID sends to the DB
-                option.text = client.name;      // The Name shows to the User
+                option.value = client.id;   
+                option.text = client.name;   
                 clientSelect.add(option);
             });
         }
@@ -319,14 +377,16 @@ async function loadClientsForDropdown() {
     }
 }
 
+
+
 loadClientsForDropdown();
 
-// 8. Mark Task as Complete
+// Mark Task as Complete
 async function markComplete(taskId) {
     updateTaskStatus(taskId, 'done');
 }
 
-// 9. Mark Task as Pending (Undo)
+// Mark Task as Pending (Undo)
 async function markPending(taskId) {
     updateTaskStatus(taskId, 'pending');
 }
@@ -344,7 +404,7 @@ async function updateTaskStatus(taskId, newStatus) {
         });
 
         if (response.ok) {
-            loadTasks(); // Refresh list to see change
+            loadTasks(); 
         } else {
             alert('Error updating status');
         }
