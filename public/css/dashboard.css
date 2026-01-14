@@ -167,3 +167,33 @@
     font-size: 16px;
 }
 .priority-high { color: #D32F2F; }
+
+/* --- EXPANDED CLIENT VIEW --- */
+.expanded-client-view {
+    background-color: #E0E0E0; /* The Light Grey Background */
+    border: 2px solid #000;    /* Black Border */
+    padding: 30px;
+    height: 100%;              /* Fills the whole screen area */
+    display: flex;
+    flex-direction: column;
+}
+
+.expanded-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #999; /* Divider line */
+    padding-bottom: 15px;
+}
+
+.expanded-header h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.client-tasks-list {
+    flex: 1;           /* Fills remaining space */
+    overflow-y: auto;  /* Allows scrolling if many tasks */
+    padding-right: 10px;
+}

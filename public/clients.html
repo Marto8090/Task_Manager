@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="dashboard-layout">
+        <header class="dash-header">
+            <div class="header-spacer"></div>
+            <h1>Clients</h1>
+            <button id="create-client-btn" class="header-btn">Actions</button>
+        </header>
+
+        <div class="dash-body">
+            
+            <aside class="sidebar">
+                <div class="filter-section">
+                    <div class="filter-header">Filter</div>
+                    <ul>
+                        <li class="active-filter">By Name (A-Z)</li>
+                        <li>By Date Added</li>
+                        <li>By Email (A-Z)</li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <button id="view-tasks-btn">View Client</button>
+                </div>
+            </aside>
+
+            <main class="task-list-container" id="client-list">
+                <p style="text-align:center; margin-top:20px;">Loading clients...</p>
+            </main>
+
+        </div>
+    </div>
+
+    <script src="js/clients.js"></script>
+</body>
+</html>
