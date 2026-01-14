@@ -138,7 +138,7 @@ async function loadTasks(filterClientId = null) {
     }
 }
 
-// 5. Render Tasks (Using Client Name)
+// 5. RENDER TASKS (With Edit Button)
 function renderTasks(tasks) {
     if (tasks.length === 0) {
         taskListContainer.innerHTML = '<p style="text-align:center; color:#666;">No tasks found.</p>';
@@ -152,29 +152,34 @@ function renderTasks(tasks) {
         const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         
         // Priority Color
-        const priorityClass = task.priority === 'high' ? 'priority-high' : '';
-        const priorityLabel = `(${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)})`; 
-
-        // Status Color
+        let priorityClass = '';
+        if (task.priority === 'high') priorityClass = 'priority-high';
+        else if (task.priority === 'medium') priorityClass = 'priority-medium';
+        else if (task.priority === 'low') priorityClass = 'priority-low';
+        
+        const priorityLabel = `(${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)})`;
         const isDone = task.status === 'done' || task.status === 'completed';
         const statusColor = isDone ? 'color:green' : 'color:black';
-
-        // If done: Green Check. If not: Grey Outline Check.
         const checkIcon = isDone ? '✅' : '☑️'; 
         const checkAction = isDone ? `markPending(${task.id})` : `markComplete(${task.id})`;
 
-      const cardHTML = `
-            <div class="task-card" style="${isDone ? 'opacity: 0.7; background-color: #f0f0f0;' : ''}">
+        // We give the card a unique ID (task-card-123) so we can target it later
+        const cardHTML = `
+            <div id="task-card-${task.id}" class="task-card" style="${isDone ? 'opacity: 0.7; background-color: #f0f0f0;' : ''}">
                 <div class="card-left">
                     <h3>${task.title}</h3>
                     <p class="client-name">Client: ${task.client_name || 'Unknown'}</p>
+                    ${task.description ? `<p style="font-size:12px; color:#555; margin-top:4px;">${task.description}</p>` : ''}
                 </div>
                 <div class="card-right">
                     <span>Due: ${dateStr}</span>
                     <span class="${priorityClass}">${priorityLabel}</span>
-                    <span style="${statusColor}">Status: ${task.status}</span>
                     
-                    <button onclick="${checkAction}" title="Toggle Status" style="cursor:pointer; font-size:18px; border:none; background:none; margin-right:10px;">
+                    <button onclick="enableEditMode(${task.id})" style="padding:5px 10px; cursor:pointer; background:#e0e0e0; border:1px solid #999; border-radius:4px; margin-right:10px;">
+                        Edit
+                    </button>
+
+                    <button onclick="${checkAction}" title="Toggle Status" style="cursor:pointer; font-size:18px; border:none; background:none; margin-right:5px;">
                         ${checkIcon}
                     </button>
 
@@ -187,6 +192,73 @@ function renderTasks(tasks) {
         
         taskListContainer.innerHTML += cardHTML;
     });
+}
+
+// Turn Card into Form
+function enableEditMode(taskId) {
+    const task = allTasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const card = document.getElementById(`task-card-${taskId}`);
+    
+    // Format Date for Input (YYYY-MM-DD)
+    const dateObj = new Date(task.due_date);
+    const dateInputVal = dateObj.toISOString().split('T')[0];
+
+    // Replace Card HTML with Inputs
+    card.innerHTML = `
+        <div style="width:100%; display:flex; flex-direction:column; gap:10px;">
+            <input type="text" id="edit-title-${taskId}" value="${task.title}" style="padding:8px; width:100%;">
+            <textarea id="edit-desc-${taskId}" rows="2" style="padding:8px; width:100%;">${task.description || ''}</textarea>
+            
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input type="date" id="edit-date-${taskId}" value="${dateInputVal}" style="padding:5px;">
+                
+                <select id="edit-priority-${taskId}" style="padding:5px;">
+                    <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+                    <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                    <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+                </select>
+
+                <div style="margin-left:auto; display:flex; gap:5px;">
+                    <button onclick="saveTaskEdit(${taskId})" style="background:#4CAF50; color:white; border:none; padding:5px 15px; border-radius:4px; cursor:pointer;">Save</button>
+                    <button onclick="loadTasks()" style="background:#ccc; border:none; padding:5px 15px; border-radius:4px; cursor:pointer;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Save Changes to Backend
+async function saveTaskEdit(taskId) {
+    const newTitle = document.getElementById(`edit-title-${taskId}`).value;
+    const newDesc = document.getElementById(`edit-desc-${taskId}`).value;
+    const newDate = document.getElementById(`edit-date-${taskId}`).value;
+    const newPriority = document.getElementById(`edit-priority-${taskId}`).value;
+
+    try {
+        const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({
+                title: newTitle,
+                description: newDesc,
+                due_date: newDate,
+                priority: newPriority
+            })
+        });
+
+        if (response.ok) {
+            loadTasks(); // Reload list to show updated card
+        } else {
+            alert('Error updating task');
+        }
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 // 6. Delete Task

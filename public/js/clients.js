@@ -137,10 +137,14 @@ function renderExpandedTasks(tasks) {
     container.innerHTML = '';
 
     tasks.forEach(task => {
+        
         const dateStr = new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        let priorityClass = '';
+        if (task.priority === 'high') priorityClass = 'priority-high';
+        else if (task.priority === 'medium') priorityClass = 'priority-medium';
+        else if (task.priority === 'low') priorityClass = 'priority-low';
+        
         const priorityLabel = `(${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)})`;
-        const priorityClass = task.priority === 'high' ? 'priority-high' : '';
-
      
         const html = `
             <div class="task-card" style="background-color:#A0A0A0; border:1px solid #000; margin-bottom:10px;">

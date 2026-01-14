@@ -98,32 +98,40 @@ router.get('/tasks', async (req, res) => {
     }
 });
 
-// 3. Update a Task (PUT /api/tasks/:id)   :id used as placeholder
-router.put('/tasks/:id', async(request, response) => {
-    const { id } = request.params; // Getting the ID number from the URL
-    const { status, description, priority } = request.body // Getting the new data
-
-    try{
-        // 1. Does this task exist? 
-        // 2. Does it belong to the logged-in user?
+// 3. Update a Task (Now supports Title & Date!)
+router.put('/tasks/:id', async (request, response) => {
+    const { id } = request.params;
+    const { title, status, description, priority, due_date } = request.body; 
+    
+    try {
+        // 1. Check ownership
         const verifyTask = await client.query(
             'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
             [id, request.user.userId]
         );
 
-        if(verifyTask.rows.length === 0){
-            return response.status(403).json({ error: 'Access denied to this client.' })
-        };
-        // UPDATING THE DATABASE
-        // using COALESCE so if I don't send a new value, it keeps the old one.
-        const query = ` UPDATE tasks SET status = COALESCE($1, status), description = COALESCE($2, description),
-                        priority = COALESCE($3, priority) WHERE id = $4 AND user_id = $5 RETURNING *; `;
+        if (verifyTask.rows.length === 0) {
+            return response.status(403).json({ error: 'Access denied.' });
+        }
 
-        const result = await client.query(query, [status, description, priority, id, request.user.userId]);
+        // 2. Update logic
+        const query = `
+            UPDATE tasks 
+            SET title = COALESCE($1, title),
+                status = COALESCE($2, status),
+                description = COALESCE($3, description),
+                priority = COALESCE($4, priority),
+                due_date = COALESCE($5, due_date)
+            WHERE id = $6 AND user_id = $7 
+            RETURNING *;
+        `;
 
-        response.json({message: 'Task updated!', task: result.rows[0] });
-    }
-    catch(error){
+        const values = [title, status, description, priority, due_date, id, request.user.userId];
+        const result = await client.query(query, values);
+
+        response.json({ message: 'Task updated!', task: result.rows[0] });
+
+    } catch (error) {
         console.error('Error updating task:', error);
         response.status(500).json({ error: 'Server error' });
     }

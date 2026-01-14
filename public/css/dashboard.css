@@ -39,11 +39,22 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    
-    /* Force it to the right */
     margin-left: auto; 
     display: block;
 }
+
+.header-right {
+    display: flex;
+    align-items: center; 
+    gap: 20px;         
+}
+
+.header-logo {
+    height: 45px;   
+    width: auto;      
+    cursor: pointer;
+}
+
 /* Body */
 .dash-body {
     display: flex;
@@ -70,18 +81,15 @@
     transition: background 0.2s;
 }
 
-/* Hover effect for better UX */
 .radio-option:hover {
     background-color: #d1d1d1;
 }
 
-/* Custom size for the actual radio circle if you want it larger */
 .radio-option input[type="radio"] {
-    transform: scale(1.2); /* Makes the circle 20% bigger */
+    transform: scale(1.2);
     margin: 0;
 }
 
-/* Sidebar */
 .sidebar {
     width: 260px;
     display: flex;
@@ -108,7 +116,6 @@
 .sidebar li:hover { background-color: rgba(0,0,0,0.05); }
 .active-filter { background-color: #757575 !important; color: white !important; }
 
-/* --- SIDEBAR FOOTER (Bottom Section) --- */
 .sidebar-footer {
     margin-top: auto; 
     padding: 20px;
@@ -119,7 +126,6 @@
     background-color: #f4f4f4; 
 }
 
-/* SHARED BUTTON STYLE (Size & Shape) */
 .nav-btn {
     width: 100%;
     padding: 12px 0;
@@ -131,7 +137,6 @@
     transition: all 0.2s ease;
 }
 
-/* 1. "View Clients" & "View Tasks" (The Dark Grey Buttons) */
 .nav-btn:not(.logout-btn) {
     background-color: #757575; /* Dark Grey matching your screenshot */
     color: white;
@@ -142,7 +147,6 @@
     background-color: #555;
 }
 
-/* 2. "Logout" Button (The White Button) */
 .logout-btn {
     background-color: white;
     color: #333;
@@ -187,22 +191,21 @@
 .card-right {
     display: flex;
     align-items: center;
-    gap: 20px; /* Adjust spacing as needed */
+    gap: 20px;
 }
 
-/* Force text to stay on one line */
 .card-right span {
     white-space: nowrap; 
     font-size: 16px;
 }
 .priority-high { color: #D32F2F; }
 
-/* --- EXPANDED CLIENT VIEW --- */
+
 .expanded-client-view {
-    background-color: #E0E0E0; /* The Light Grey Background */
-    border: 2px solid #000;    /* Black Border */
+    background-color: #E0E0E0; 
+    border: 2px solid #000;  
     padding: 30px;
-    height: 100%;              /* Fills the whole screen area */
+    height: 100%;              
     display: flex;
     flex-direction: column;
 }
@@ -212,7 +215,7 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 20px;
-    border-bottom: 1px solid #999; /* Divider line */
+    border-bottom: 1px solid #999;
     padding-bottom: 15px;
 }
 
@@ -222,7 +225,22 @@
 }
 
 .client-tasks-list {
-    flex: 1;           /* Fills remaining space */
-    overflow-y: auto;  /* Allows scrolling if many tasks */
+    flex: 1;          
+    overflow-y: auto;  
     padding-right: 10px;
+}
+
+.priority-high {
+    color: #D32F2F; 
+    font-weight: bold;
+}
+
+.priority-medium {
+    color: #F57C00; 
+    font-weight: bold;
+}
+
+.priority-low {
+    color: #388E3C; 
+    font-weight: bold;
 }

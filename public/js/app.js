@@ -7,14 +7,13 @@ const authBtn = document.getElementById('auth-btn');
 const toggleAuth = document.getElementById('toggle-auth');
 const errorMsg = document.getElementById('error-msg');
 
-let isLoginMode = false;
+let isLoginMode = true;
 
 // 1. Check if already logged in
 if (localStorage.getItem('token')) {
     window.location.href = 'dashboard.html'; // <--- REDIRECT
 }
 
-// 2. Toggle Login/Signup
 // 2. Toggle Login/Signup
 toggleAuth.addEventListener('click', () => {
     isLoginMode = !isLoginMode;
