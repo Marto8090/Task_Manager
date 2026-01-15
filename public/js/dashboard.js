@@ -26,7 +26,6 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => {
 // 4. Create Task Form Logic
 const createTaskForm = document.getElementById('create-task-form');
 if (createTaskForm) {
-    // NEW: Prevent selecting past dates
     const dateInput = document.getElementById('task-date');
     if (dateInput) {
         // Get today's date in local time (YYYY-MM-DD format)
@@ -117,9 +116,9 @@ function applyFilter(filterName) {
     renderTasks(filtered);
 }
 
-// 6. Fetch Tasks (SAFE MODE: Checks if taskListContainer exists first)
+// 6. Fetch Tasks 
 async function loadTasks(filterClientId = null) {
-    if (!taskListContainer) return; // STOP if we are not on the dashboard
+    if (!taskListContainer) return; 
 
     taskListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">Loading...</p>';
 
@@ -147,7 +146,7 @@ async function loadTasks(filterClientId = null) {
     }
 }
 
-// 7. Render Tasks (Clean Version: No Priority Text)
+// 7. Render Tasks 
 function renderTasks(tasks) {
     if (!taskListContainer) return;
 
@@ -205,7 +204,7 @@ function renderTasks(tasks) {
     });
 }
 
-// 8. Load Clients for Dropdown (SAFE MODE: Checks if dropdown exists)
+// 8. Load Clients for Dropdown
 async function loadClientsForDropdown() {
     if (!clientSelect) return; 
 
@@ -217,8 +216,6 @@ async function loadClientsForDropdown() {
         if (response.ok) {
             const clients = await response.json();
             
-            // FIX 1: Add 'disabled selected hidden'
-            // This makes "Select a Client..." the default, but removes it from the dropdown list when opened.
             clientSelect.innerHTML = '<option value="" disabled selected hidden>Select a Client...</option>';
 
             if (clients.length === 0) {
@@ -228,20 +225,16 @@ async function loadClientsForDropdown() {
                  return;
             }
 
-            // FIX 2: Remove Duplicates from the list
-            // This prevents the list from getting super long with the same names
             const uniqueClients = [];
             const seenIds = new Set();
 
-            clients.forEach(client => {
-                // If we haven't seen this client Name/ID before, add it
+            clients.forEach(client => { 
                 if (!seenIds.has(client.name)) {
                     seenIds.add(client.name);
                     uniqueClients.push(client);
                 }
             });
 
-            // Add the clean, unique list to the dropdown
             uniqueClients.forEach(client => {
                 const option = document.createElement('option');
                 option.value = client.id;
@@ -279,7 +272,6 @@ function enableEditMode(taskId) {
     const dateObj = new Date(task.due_date);
     const dateInputVal = dateObj.toISOString().split('T')[0];
 
-    // NEW: Get today's date for the 'min' attribute
     const today = new Date();
     const minDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
@@ -385,12 +377,10 @@ if(confirmDeleteBtn) {
     });
 }
 
-// 1. If we have a client select box, load the clients
 if (clientSelect) {
     loadClientsForDropdown();
 }
 
-// 2. If we have a task list, load the tasks
 if (taskListContainer) {
     loadTasks();
 }

@@ -8,29 +8,26 @@ const client = require('../db'); // Import our DB connection
 router.post('/register', async (request, response) => {
     const { username, password } = request.body;
 
-    // Check if I got both inputs. If not, send back 400 Bad requestuest.
     if (!username || !password) {
-        return response.status(400).json({ error: 'Username and password are requestuired.' });
+        return response.status(400).json({ error: 'Username and password are required.' });
     }
     try {
         // 1. Hash the password (10 salt rounds is standard).
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // 2. Insert the user into the 'users' table.
-        // Useing parameterized query ($1, $2) to prevent SQL injection.
         const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username, created_at';
         const values = [username, hashedPassword];
 
-        const responseult = await client.query(query, values);
+        const result = await client.query(query, values);
         
         // Success: Send back 201 Created and the new user's public info.
         response.status(201).json({ 
             message: 'User registered successfully',
-            user: responseult.rows[0] 
+            user: result.rows[0] 
         });
 
     } catch (error) {
-        // Handle unique username conflict (PostgresponseQL code 23505).
         if (error.code === '23505') { 
             return response.status(409).json({ error: 'Username already taken.' });
         }
@@ -40,21 +37,20 @@ router.post('/register', async (request, response) => {
     }
 });
 
-// LOGIN ENDPOINT --------------------------------------
+// LOGIN ENDPOINT 
 
 // POST /api/login - Authenticates a user and returns a token
 router.post('/login', async (request, response) => {
     const { username, password } = request.body;
 
-    // 1. Check if both fields are presponseent
     if (!username || !password) {
-        return response.status(400).json({ error: 'Username and password are requestuired.' });
+        return response.status(400).json({ error: 'Username and password are required.' });
     }
     try {
         // 2. Find the user in the database
         const query = 'SELECT * FROM users WHERE username = $1';
-        const responseult = await client.query(query, [username]);
-        const user = responseult.rows[0];
+        const result = await client.query(query, [username]);
+        const user = result.rows[0];
 
         // 3. User not found checks
         if (!user) {
@@ -72,7 +68,7 @@ router.post('/login', async (request, response) => {
         const token = jwt.sign(
             { userId: user.id, username: user.username }, 
             process.env.JWT_SECRET, 
-            { expiresIn: '1h' } // Token expiresponse in 1 hour
+            { expiresIn: '1h' } 
         );
 
         // 6. Send the token back to the user

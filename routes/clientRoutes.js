@@ -3,11 +3,9 @@ const router = express.Router();
 const client = require('../db');
 const authenticateToken = require('../middleware/auth')
 
-// Apply the security guard to ALL routes in this file automatically
 router.use(authenticateToken);
 
 // POST /api/clients - Create a new client
-// !!!'authenticateToken' is the 2nd argument. It runs first!
 router.post('/clients', authenticateToken, async (req, res) => {
     const { name, email } = req.body;
 
@@ -66,7 +64,6 @@ router.put('/clients/:id', authenticateToken, async (req, res) => {
         }
 
         // 2. Update the client in the database
-        // We use COALESCE so if you only send a name, the email stays the same (and vice versa)
         const query = `
             UPDATE clients 
             SET name = COALESCE($1, name), 

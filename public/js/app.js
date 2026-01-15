@@ -11,7 +11,7 @@ let isLoginMode = true;
 
 // 1. Check if already logged in
 if (localStorage.getItem('token')) {
-    window.location.href = 'dashboard.html'; // <--- REDIRECT
+    window.location.href = 'dashboard.html'; 
 }
 
 // 2. Toggle Login/Signup
@@ -55,7 +55,7 @@ authForm.addEventListener('submit', async (e) => {
         if (response.ok) {
             if (isLoginMode) {
                 localStorage.setItem('token', data.token);
-                window.location.href = 'dashboard.html'; // <--- REDIRECT
+                window.location.href = 'dashboard.html';
             } else {
                 alert('Account created! Please login.');
                 toggleAuth.click(); 

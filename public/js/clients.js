@@ -137,7 +137,7 @@ async function expandClientView(clientId) {
     } catch (err) { console.error(err); }
 }
 
-// B. "Edit Mode" - Fixed Alignment (No Margins)
+// B. "Edit Mode"
 function enableClientEditMode(clientId) {
     const client = allClients.find(c => c.id === clientId);
     if (!client) return;
@@ -200,7 +200,7 @@ function confirmDeleteClient(clientId) {
 
     // 2. Setup "Delete" button
     const confirmBtn = document.getElementById('confirm-delete-btn');
-    const newBtn = confirmBtn.cloneNode(true); // Remove old listeners
+    const newBtn = confirmBtn.cloneNode(true); 
     confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
 
     newBtn.addEventListener('click', () => {
@@ -216,7 +216,7 @@ function confirmDeleteClient(clientId) {
         };
     }
     
-    // 4. (Optional) Close if clicking outside the white box
+    
     window.onclick = (event) => {
         if (event.target === modal) {
             modal.style.display = 'none';
