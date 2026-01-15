@@ -31,7 +31,6 @@
     </div>
 
     <script>
-        // Simple inline script for this form
         const API = 'http://localhost:3000/api';
         const tkn = localStorage.getItem('token');
         if(!tkn) window.location.href = 'index.html';
@@ -52,7 +51,7 @@
                 });
 
                 if(res.ok) {
-                    window.location.href = 'clients.html'; // Go back to list
+                    window.location.href = 'clients.html'; 
                 } else {
                     alert('Error creating client');
                 }

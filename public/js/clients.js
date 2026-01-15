@@ -70,7 +70,7 @@ function renderClients(clients) {
                 <div class="card-right">
                     <button onclick="expandClientView(${client.id})" 
                             style="padding:8px 16px; cursor:pointer; background:#e0e0e0; border:1px solid #999; border-radius:4px;">
-                        [View Client Tasks]
+                        [View Client Details]
                     </button>
                 </div>
             </div>
@@ -78,51 +78,169 @@ function renderClients(clients) {
         clientListContainer.innerHTML += html;
     });
 }
+
 async function expandClientView(clientId) {
-    // A. Find the client data
     const client = allClients.find(c => c.id === clientId);
     if (!client) return;
 
-    // B. Clear the container 
     clientListContainer.innerHTML = '';
 
-    // C. Build the "Big Card" Structure
     const expandedCard = document.createElement('div');
-    expandedCard.className = 'expanded-client-view'; // Uses our new CSS
+    expandedCard.className = 'expanded-client-view'; 
     
     expandedCard.innerHTML = `
-        <div class="expanded-header">
-            <div>
-                <h2>${client.name}</h2>
-                <p style="color:#555;">${client.contact_email || 'No email'}</p>
+        <div id="client-header-${client.id}" class="expanded-header" style="display:flex; justify-content:space-between;
+        align-items:center; border-bottom:1px solid #ccc; padding-bottom:15px; margin-bottom:15px;">
+            
+            <div id="client-info-display">
+                <h2 style="margin:0;">${client.name}</h2>
+                <p style="color:#555; margin:5px 0 0 0;">${client.contact_email || 'No email'}</p>
             </div>
-            <button id="close-expanded-btn" style="height:40px; padding:0 20px; cursor:pointer; background:#ccc; border:1px solid #999; border-radius:4px;">
-                [Close]
-            </button>
+
+            <div style="display:flex; gap:15px; align-items:center;">
+                
+                <button onclick="enableClientEditMode(${client.id})" title="Edit Client" 
+                    style="background:none; border:none; padding:0; cursor:pointer;">
+                    <img src="images/edit-icon.png" style="width:40px; height:40px; display:block;" alt="Edit">
+                </button>
+
+                <button onclick="confirmDeleteClient(${client.id})" title="Delete Client" 
+                    style="background:none; border:none; padding:0; cursor:pointer;">
+                    <img src="images/delete-icon.png" style="width:40px; height:40px; display:block;" alt="Delete">
+                </button>
+
+                <button id="close-expanded-btn" title="Close View" style="background:none; border:none; padding:0; cursor:pointer;">
+                    <img src="images/close-icon.png" style="width:40px; height:40px; display:block;" alt="Close">
+                </button>
+            </div>
         </div>
+
         <div id="expanded-tasks-list" class="client-tasks-list">
-            <p>Loading tasks...</p>
+            <p style="text-align:center; margin-top:20px;">Loading tasks...</p>
         </div>
     `;
 
     clientListContainer.appendChild(expandedCard);
 
-    // D. Add Close Button Logic
     document.getElementById('close-expanded-btn').addEventListener('click', () => {
         const activeFilter = document.querySelector('.sidebar li.active-filter');
         const filterName = activeFilter ? activeFilter.innerText.trim() : 'By Name (A-Z)';
         sortClients(filterName);
     });
 
-    // E. Fetch & Render Tasks
     try {
         const response = await fetch(`${API_URL}/tasks?client_id=${clientId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const tasks = await response.json();
         renderExpandedTasks(tasks);
+    } catch (err) { console.error(err); }
+}
+
+// B. "Edit Mode" - Fixed Alignment (No Margins)
+function enableClientEditMode(clientId) {
+    const client = allClients.find(c => c.id === clientId);
+    if (!client) return;
+
+    const displayDiv = document.getElementById('client-info-display');
+    
+    displayDiv.innerHTML = `
+        <div style="display:flex; align-items:center; gap: 15px;">
+            
+            <div style="display:flex; flex-direction:row; gap:10px; align-items:center;">
+                <input type="text" id="edit-client-name" value="${client.name}" 
+                    style="font-size:18px; font-weight:bold; padding:5px; width:200px; margin:0; border:1px solid #ccc; border-radius:3px;">
+                
+                <input type="email" id="edit-client-email" value="${client.contact_email || ''}" placeholder="Email" 
+                    style="padding:5px; width:220px; margin:0; border:1px solid #ccc; border-radius:3px;">
+            </div>
+
+            <div style="display:flex; gap:5px; align-items:center;">
+                <button onclick="saveClientChanges(${client.id})" style="background:#4CAF50; color:white; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:bold; margin:0;">Save</button>
+                <button onclick="expandClientView(${client.id})" style="background:#ccc; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:bold; margin:0;">Cancel</button>
+            </div>
+        </div>
+    `;
+}
+
+// C. Save Function
+async function saveClientChanges(clientId) {
+    const newName = document.getElementById('edit-client-name').value;
+    const newEmail = document.getElementById('edit-client-email').value;
+
+    try {
+        const response = await fetch(`${API_URL}/clients/${clientId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ name: newName, contact_email: newEmail })
+        });
+
+        if (response.ok) {
+         
+            loadClients();
+            setTimeout(() => expandClientView(clientId), 100);
+        } else {
+            alert('Error updating client');
+        }
+    } catch (err) { console.error(err); }
+}
+
+// Show the Confirmation Popup
+function confirmDeleteClient(clientId) {
+    const modal = document.getElementById('delete-modal');
+    
+    // Safety check
+    if (!modal) {
+        if(confirm("Delete this client?")) deleteClientAPI(clientId);
+        return;
+    }
+
+    // 1. Show the modal (CSS class handles the centering)
+    modal.style.display = 'flex';
+
+    // 2. Setup "Delete" button
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+    const newBtn = confirmBtn.cloneNode(true); // Remove old listeners
+    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+    newBtn.addEventListener('click', () => {
+        deleteClientAPI(clientId);
+        modal.style.display = 'none';
+    });
+
+    // 3. Setup "Cancel" button
+    const cancelBtn = document.getElementById('cancel-delete-btn');
+    if (cancelBtn) {
+        cancelBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+    }
+    
+    // 4. (Optional) Close if clicking outside the white box
+    window.onclick = (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+}
+
+// Actually Delete the Client (API Call)
+async function deleteClientAPI(clientId) {
+    try {
+        const response = await fetch(`${API_URL}/clients/${clientId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+           
+            loadClients(); 
+        } else {
+            alert('Cannot delete client. They might still have active tasks.');
+        }
     } catch (err) {
         console.error(err);
+        alert('Error connecting to server.');
     }
 }
 

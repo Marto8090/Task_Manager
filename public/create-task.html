@@ -17,7 +17,7 @@
         </header>
 
         <div class="form-container-center" style="display:flex; justify-content:center; align-items:center; height:100%; padding:20px;">
-            <div class="task-form-box" style="background:#E0E0E0; border:1px solid #000; padding:40px; width:600px;">
+            <div class="task-form-box" style="background:#E0E0E0; border:1px solid #000; padding:40px; width:600px; ">
                 <form id="create-task-form">
                     <label>Title</label>
                     <input type="text" id="task-title" required>
@@ -28,7 +28,7 @@
                     </select>
 
                     <label>Description</label>
-                    <textarea id="task-desc" rows="4" style="width:100%; margin-bottom:20px; border:1px solid #ccc;"></textarea>
+                    <textarea id="task-desc" rows="4" style="width:100%; margin-bottom:20px; resize: vertical; max-height: 180px; border:1px solid #ccc;"></textarea>
 
                     <label>Due Date</label>
                     <input type="date" id="task-date">

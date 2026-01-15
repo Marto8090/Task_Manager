@@ -16,7 +16,7 @@
 
             <h1>Clients</h1>
 
-            <button id="create-client-btn" class="header-btn">Actions</button>
+            <button id="create-client-btn" class="header-btn">Create Client</button>
         </header>
        
 
@@ -43,6 +43,17 @@
                 <p style="text-align:center; margin-top:20px;">Loading clients...</p>
             </main>
 
+        </div>
+    </div>
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Delete Client?</h3>
+            <p>Are you sure you want to delete this client? This action cannot be undone.</p>
+            
+            <div class="modal-actions">
+                <button id="confirm-delete-btn" class="modal-btn btn-delete">Yes, Delete</button>
+                <button id="cancel-delete-btn" class="modal-btn btn-cancel">Cancel</button>
+            </div>
         </div>
     </div>
 
