@@ -1,9 +1,17 @@
 const API_URL = 'http://localhost:3000/api';
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token'); 
 
-// 1. Auth Check
 if (!token) {
+   
     window.location.href = 'index.html';
+} else {
+   
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('loading-overlay');
+        if (loader) {
+            loader.classList.add('loader-hidden');
+        }
+    });
 }
 
 // 2. Global Selectors
@@ -17,8 +25,9 @@ const logoutBtn = document.getElementById('logout-btn');
 
 if (createTaskBtn) createTaskBtn.addEventListener('click', () => window.location.href = 'create-task.html');
 if (viewClientsBtn) viewClientsBtn.addEventListener('click', () => window.location.href = 'clients.html');
+
 if (logoutBtn) logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token'); 
     window.location.href = 'index.html';
 });
 

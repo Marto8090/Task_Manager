@@ -9,33 +9,27 @@
 
 /* Header */
 .dash-header {
-    background-color: #ffffff;      /* Clean White */
+    background-color: #ffffff;      
     height: 70px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 30px;
     
-    /* Modern Depth: Soft shadow instead of a border line */
     border-bottom: 4px solid #e0e0e0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    z-index: 10;                    /* Ensures shadow floats above the body */
+    z-index: 10;                   
 }
 
 /* The Logo Area */
 .header-logo {
     height: 45px;
     width: auto;
-    /* Optional: If your logo is dark, this makes it pop slightly less */
     opacity: 0.9; 
 }
 
-/* The Title (Tasks) */
-/* DESIGN TIP: In modern apps, we usually REMOVE the centered title 
-   because the Sidebar already tells you where you are. 
-   If you keep it, let's make it lighter. */
 .dash-header h1 {
-    font-size: 26px;       /* Smaller, cleaner */
+    font-size: 26px;       
     font-weight: 600;
     color: #333;
     margin: 0;
@@ -45,19 +39,18 @@
     letter-spacing: -0.5px;
 }
 
-/* The "Primary Action" Button (Create Task) */
-/* This is the most important button on the screen—make it GREEN. */
+
 .header-btn {
-    background-color: #388e3c; /* Match your priority/active color */
+    background-color: #388e3c; 
     color: white;
     
-    padding: 10px 24px;        /* Wider, easier to click */
+    padding: 10px 24px;        
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.5px;
     width: auto;
     border: none;
-    border-radius: 6px;        /* Matches sidebar/card radius */
+    border-radius: 6px;        
     cursor: pointer;
     
     /* Button Pop Effect */
@@ -66,8 +59,8 @@
 }
 
 .header-btn:hover {
-    background-color: #2e7d32; /* Darker Green */
-    transform: translateY(-1px); /* Slight lift */
+    background-color: #2e7d32; 
+    transform: translateY(-1px); 
     box-shadow: 0 6px 12px rgba(56, 142, 60, 0.3);
 }
 /* Body */
@@ -84,16 +77,22 @@
     margin-bottom: 24px;
 }
 
-/* Individual Radio Option */
 .radio-option {
     display: flex;
     align-items: center;
-    gap: 8px; /* Space between circle and text */
+    gap: 8px; 
     font-weight: normal;
-    cursor: pointer; /* Shows a hand icon on hover */
-    padding: 5px 10px; /* Adds a little hit area */
+    cursor: pointer; 
+    padding: 5px 10px;
     border-radius: 4px;
     transition: background 0.2s;
+}
+
+.text {
+    text-align: center;    
+    width: 100%;          
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .radio-option:hover {
@@ -109,29 +108,28 @@
     width: 260px;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #e0e0e0; /* Subtle divider line */
-    background-color: #f9f9f9;       /* Very light grey background */
+    border-right: 1px solid #e0e0e0;
+    background-color: #f9f9f9;
     flex-shrink: 0;
 }
 
 .filter-section {
     flex: 1;
-    background-color: transparent; /* Removed the Pink */
-    padding: 25px 15px;            /* More breathing room */
+    background-color: transparent; 
+    padding: 25px 15px;            
 }
 
-/* The "FILTER" Label - Now subtle and professional */
 .filter-header {
     background-color: transparent; 
     box-shadow: none;
     border: none;
     
-    color: #888;                   /* Muted Text */
-    font-size: 12px;               /* Small label */
+    color: #888;                  
+    font-size: 12px;               
     font-weight: 700;
     text-transform: uppercase;
-    text-align: left;              /* Aligned Left */
-    padding: 0 15px 15px 15px;     /* Spacing below it */
+    text-align: left;              
+    padding: 0 15px 15px 15px;     
     letter-spacing: 1px;
 }
 
@@ -153,14 +151,14 @@
 }
 
 .sidebar li:hover {
-    background-color: #e8f5e9; /* Very soft green hover */
+    background-color: #e8f5e9; 
     color: #2e7d32;
 }
 
 /* Updated Active State */
 .active-filter {
-    background-color: #c8e6c9 !important; /* Soft green active background */
-    color: #1b5e20 !important;           /* Darker green text for contrast */
+    background-color: #c8e6c9 !important; 
+    color: #1b5e20 !important;         
     font-weight: 700 !important;
     border-left: 4px solid #388e3c;
 }
@@ -187,18 +185,18 @@
 }
 
 .icon-btn {
-    background: transparent; /* No more grey box */
+    background: transparent;
     border: none;
     padding: 8px;
     cursor: pointer;
-    border-radius: 50%; /* Circle shape */
+    border-radius: 50%;
     transition: background-color 0.2s, transform 0.2s;
-    color: #555; /* Icon color if you switch to SVG later */
+    color: #555; 
 }
 
 /* Add a subtle hover effect */
 .icon-btn:hover {
-    background-color: #f0f0f0; /* Light grey circle on hover */
+    background-color: #f0f0f0; 
     transform: scale(1.1);
 }
 
@@ -206,8 +204,6 @@
     width: 40px; 
     height: 40px;
     display: block;
-    /* Optional: if your icons are black but you want them dark grey */
-    /* opacity: 0.8; */ 
 }
 
 .nav-btn {
@@ -222,7 +218,7 @@
 }
 
 .nav-btn:not(.logout-btn) {
-    background-color: #757575; /* Dark Grey matching your screenshot */
+    background-color: #757575; 
     color: white;
     border: none;
 }
@@ -244,11 +240,11 @@
 }
 
 .modal-overlay {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dimmed background */
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     justify-content: center;
     align-items: center;
@@ -301,34 +297,32 @@
     to { transform: scale(1); opacity: 1; }
 }
 
-/* --- FORM PAGE CONTRAST --- */
-
-/* 1. Background for the entire page */
+/* Background for the entire page */
 .form-page-bg {
-    background-color: #f4f7f6 !important; /* Soft mint-grey background */
+    background-color: #f4f7f6 !important; 
     min-height: 100vh;
 }
 
-/* 2. Centering wrapper */
+/* Centering wrapper */
 .form-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 60px; /* Space below header */
+    padding-top: 60px; 
 }
 
-/* 3. The Form Box (The "floating" card effect) */
+/* The Form Box */
 .task-form-box {
     background: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
     width: 100%;
-    max-width: 500px; /* Limits width for better readability */
+    max-width: 500px; 
     padding: 40px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Soft shadow for depth */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
 }
 
-/* 4. Improve Label Visibility */
+/* Improve Label Visibility */
 .task-form-box label {
     display: block;
     font-weight: 600;
@@ -336,7 +330,7 @@
     margin-bottom: 8px;
 }
 
-/* 5. Center the Action Button */
+/* Center the Action Button */
 .form-actions {
     display: flex;
     justify-content: center;
@@ -349,9 +343,9 @@
     padding: 12px 40px !important;
 }
 
-/* 6. Back Button styling for better contrast */
+/* Back Button styling for better contrast */
 .back-btn {
-    background-color: #757575 !important; /* Neutral grey for secondary action */
+    background-color: #757575 !important; 
 }
 
 /* Task Cards */
@@ -359,7 +353,7 @@
     flex: 1;
     padding: 30px;
     overflow-y: auto;
-    background-color: #f0f2f5; /* A slightly deeper, cooler grey/blue */
+    background-color: #f0f2f5; 
 }
 
 .task-card {
@@ -372,7 +366,7 @@
     justify-content: space-between;
     align-items: center;
     
-    border: 4px solid rgba(0,0,0,0.05); /* Very faint border */
+    border: 4px solid rgba(0,0,0,0.05); 
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -393,19 +387,19 @@
 }
 
 .card-left h3 {
-    margin: 0 0 8px 0;     /* Add spacing below title */
-    font-size: 20px;       /* Larger font */
-    font-weight: 800;      /* Extra bold */
-    color: #222;           /* Dark solid black */
-    letter-spacing: -0.5px;/* Tighter, modern look */
+    margin: 0 0 8px 0;     
+    font-size: 20px;      
+    font-weight: 800;     
+    color: #222;          
+    letter-spacing: -0.5px;
     line-height: 1.2;
 }
 
-/* 2. Standard style for Client & Date lines on the left */
+/* Standard style for Client & Date lines on the left */
 .task-meta {
     font-size: 14px;
-    color: #666;           /* Medium grey */
-    margin-bottom: 5px;    /* Small space between lines */
+    color: #666;          
+    margin-bottom: 5px;    
     display: flex;
     align-items: center;
     font-weight: 500;
@@ -413,7 +407,7 @@
 
 /* Page Background */
 .form-container-center {
-    background-color: #f4f7f6; /* Matching your new soft body color */
+    background-color: #f4f7f6; 
 }
 
 .task-form-box, 
@@ -465,7 +459,6 @@ input:focus {
     background-color: #2e7d32;
 }
 
-/* Optional: Little icons before the meta text for flavor */
 .meta-icon {
     margin-right: 6px;
     font-size: 15px;
@@ -486,12 +479,12 @@ input:focus {
 
 
 .expanded-client-view {
-    background-color: #f4f7f6; /* Soft minty-grey background to match dashboard */
+    background-color: #f4f7f6;
     border: none;
     border-radius: 12px;
     padding: 30px;
     height: 100%;
-    box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); /* Subtle inner depth */
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .expanded-header {
@@ -500,7 +493,7 @@ input:focus {
     border-radius: 10px;
     margin-bottom: 25px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    border-bottom: none !important; /* Remove the old line */
+    border-bottom: none !important; 
 }
 
 .expanded-header h2 {
@@ -510,11 +503,46 @@ input:focus {
     text-transform: uppercase;
 }
 
-/* Ensure tasks inside the client view match the main dashboard cards */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f4f7f6; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #e0e0e0;
+    border-top: 5px solid #388e3c; 
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Helper class to hide it */
+.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
 .client-tasks-list .task-card {
-    background-color: white !important; /* Overriding the grey in your screenshot */
+    background-color: white !important;
     border: 1px solid #eee !important;
-    border-left: 5px solid transparent !important; /* Priority strip will color this */
+    border-left: 5px solid transparent !important; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
 }
 

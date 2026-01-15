@@ -142,7 +142,6 @@ router.delete('/tasks/:id', async (request, response) => {
     const { id } = request.params;
 
     try {
-        // Only deleting if it belongs to the user
         const result = await client.query(
             'DELETE FROM tasks WHERE id = $1 AND user_id = $2 RETURNING *',
             [id, request.user.userId]

@@ -1,15 +1,31 @@
 const API_URL = 'http://localhost:3000/api';
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 
 if (!token) {
+    
     window.location.href = 'index.html';
-}
+} else {
 
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('loading-overlay');
+        if (loader) {
+            loader.classList.add('loader-hidden');
+        }
+    });
+}
 // 1. Navigation
 const createClientBtn = document.getElementById('create-client-btn');
 const viewTasksBtn = document.getElementById('view-tasks-btn');
 const clientListContainer = document.getElementById('client-list');
 const filterItems = document.querySelectorAll('.sidebar li');
+const logoutBtn = document.getElementById('logout-btn');
+
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('token'); // Clear the session
+        window.location.href = 'index.html'; // Redirect to login
+    });
+}
 
 let allClients = []; 
 

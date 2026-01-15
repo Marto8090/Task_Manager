@@ -34,7 +34,7 @@
 
     <script>
         const API = 'http://localhost:3000/api';
-        const tkn = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if(!tkn) window.location.href = 'index.html';
 
         document.getElementById('add-client-form').addEventListener('submit', async (e) => {
