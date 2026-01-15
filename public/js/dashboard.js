@@ -26,6 +26,14 @@ if (logoutBtn) logoutBtn.addEventListener('click', () => {
 // 4. Create Task Form Logic
 const createTaskForm = document.getElementById('create-task-form');
 if (createTaskForm) {
+    // NEW: Prevent selecting past dates
+    const dateInput = document.getElementById('task-date');
+    if (dateInput) {
+        // Get today's date in local time (YYYY-MM-DD format)
+        const today = new Date();
+        const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+        dateInput.min = localDate;
+    }
     createTaskForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -139,9 +147,9 @@ async function loadTasks(filterClientId = null) {
     }
 }
 
-// 7. Render Tasks
+// 7. Render Tasks (Clean Version: No Priority Text)
 function renderTasks(tasks) {
-    if (!taskListContainer) return; // STOP if we are not on the dashboard
+    if (!taskListContainer) return;
 
     if (tasks.length === 0) {
         taskListContainer.innerHTML = '<p style="text-align:center; color:#666;">No tasks found.</p>';
@@ -154,19 +162,18 @@ function renderTasks(tasks) {
         const dateObj = new Date(task.due_date);
         const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         
-        // Priority
+        // Determine Priority Class
         let priorityClass = '';
         if (task.priority === 'high') priorityClass = 'priority-high';
         else if (task.priority === 'medium') priorityClass = 'priority-medium';
         else if (task.priority === 'low') priorityClass = 'priority-low';
-        const priorityLabel = `(${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)})`;
         
-        // Status
         const isDone = task.status === 'done' || task.status === 'completed';
         const checkAction = isDone ? `markPending(${task.id})` : `markComplete(${task.id})`;
 
+        // UPDATE: We added ${priorityClass} to the main div below
         const cardHTML = `
-        <div id="task-card-${task.id}" class="task-card" style="${isDone ? 'opacity: 0.7; background-color: #f8f9fa;' : ''}">
+        <div id="task-card-${task.id}" class="task-card ${priorityClass}" style="${isDone ? 'opacity: 0.7; background-color: #f8f9fa;' : ''}">
             <div class="card-left">
                 <h3>${task.title}</h3>
                 <p class="client-name" style="margin-bottom:0; margin-top: 4px;">Client: ${task.client_name || 'Unknown Client'}</p>
@@ -175,8 +182,7 @@ function renderTasks(tasks) {
             <div class="card-right">
                 <div style="display:flex; gap:15px; align-items:center; margin-right: 20px; font-size: 14px;">
                     <span>Due: ${dateStr}</span>
-                    <span class="${priorityClass}">${priorityLabel}</span>
-                </div>
+                    </div>
 
                 <div class="card-actions">
                     <button class="icon-btn" onclick="enableViewMode(${task.id})" title="View Details">
@@ -268,16 +274,22 @@ function enableEditMode(taskId) {
     const task = allTasks.find(t => t.id === taskId);
     if (!task) return;
     const card = document.getElementById(`task-card-${taskId}`);
+    
+    // Existing Date Logic
     const dateObj = new Date(task.due_date);
     const dateInputVal = dateObj.toISOString().split('T')[0];
+
+    // NEW: Get today's date for the 'min' attribute
+    const today = new Date();
+    const minDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
     card.innerHTML = `
         <div style="width:100%; display:flex; flex-direction:column; gap:10px;">
             <input type="text" id="edit-title-${taskId}" value="${task.title}" style="padding:8px; width:100%;">
-            <textarea id="edit-desc-${taskId}" rows="6" style="padding:8px; width:100%; resize: vertical;">${task.description || ''}</textarea>
+            <textarea id="edit-desc-${taskId}"MZ rows="6" style="padding:8px; width:100%; resize: vertical;">${task.description || ''}</textarea>
             
             <div style="display:flex; gap:10px; align-items:center; margin-top: 20px;">
-                <input type="date" id="edit-date-${taskId}" value="${dateInputVal}" style="padding:5px; margin: 0;">
+                <input type="date" id="edit-date-${taskId}" value="${dateInputVal}" min="${minDate}" style="padding:5px; margin: 0;">
                 
                 <select id="edit-priority-${taskId}" style="padding:5px;">
                     <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
@@ -293,6 +305,7 @@ function enableEditMode(taskId) {
         </div>
     `;
 }
+
 async function saveTaskEdit(taskId) {
     const newTitle = document.getElementById(`edit-title-${taskId}`).value;
     const newDesc = document.getElementById(`edit-desc-${taskId}`).value;

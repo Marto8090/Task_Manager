@@ -246,40 +246,33 @@ async function deleteClientAPI(clientId) {
 
 function renderExpandedTasks(tasks) {
     const container = document.getElementById('expanded-tasks-list');
-    
     if (tasks.length === 0) {
-        container.innerHTML = '<p>No tasks found for this client.</p>';
+        container.innerHTML = '<p style="text-align:center; padding:20px;">No tasks found.</p>';
         return;
     }
 
     container.innerHTML = '';
-
     tasks.forEach(task => {
-        
         const dateStr = new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
         let priorityClass = '';
         if (task.priority === 'high') priorityClass = 'priority-high';
         else if (task.priority === 'medium') priorityClass = 'priority-medium';
         else if (task.priority === 'low') priorityClass = 'priority-low';
         
-        const priorityLabel = `(${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)})`;
-     
         const html = `
-            <div class="task-card" style="background-color:#A0A0A0; border:1px solid #000; margin-bottom:10px;">
+            <div class="task-card ${priorityClass}">
                 <div class="card-left">
-                    <h3>${task.title}</h3>
-                    <p class="client-name">Client: ${task.client_name || 'Current'}</p>
+                    <h3 style="font-size:18px;">${task.title}</h3>
+                    <p style="font-size:12px; color:#888;">Status: ${task.status}</p>
                 </div>
-                <div class="card-right" style="gap:20px;">
-                    <span>Due: ${dateStr}</span>
-                    <span class="${priorityClass}">${priorityLabel}</span>
-                    <span>Status: ${task.status}</span>
+                <div class="card-right">
+                    <span style="font-size:14px; color:#666;">Due: ${dateStr}</span>
                 </div>
             </div>
         `;
         container.innerHTML += html;
     });
 }
-
 // Start
 loadClients();

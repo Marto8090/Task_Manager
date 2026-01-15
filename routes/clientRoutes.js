@@ -50,4 +50,67 @@ router.get('/clients', authenticateToken, async (req, res) => {
     }
 });
 
+router.put('/clients/:id', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const { name, contact_email } = req.body;
+
+    try {
+        // 1. Check if the client belongs to this user
+        const checkOwnership = await client.query(
+            'SELECT * FROM clients WHERE id = $1 AND user_id = $2',
+            [id, req.user.userId]
+        );
+
+        if (checkOwnership.rows.length === 0) {
+            return res.status(404).json({ error: 'Client not found or access denied.' });
+        }
+
+        // 2. Update the client in the database
+        // We use COALESCE so if you only send a name, the email stays the same (and vice versa)
+        const query = `
+            UPDATE clients 
+            SET name = COALESCE($1, name), 
+                contact_email = COALESCE($2, contact_email)
+            WHERE id = $3
+            RETURNING *;
+        `;
+        
+        const result = await client.query(query, [name, contact_email, id]);
+
+        res.json(result.rows[0]);
+
+    } catch (error) {
+        console.error('Error updating client:', error);
+        res.status(500).json({ error: 'Server error during update.' });
+    }
+});
+
+// DELETE /api/clients/:id - Delete a client AND their tasks
+router.delete('/clients/:id', authenticateToken, async (req, res) => {
+    const clientId = req.params.id;
+    try {
+        // 1. Security Check: Ensure this client belongs to the logged-in user
+        const checkOwnership = await client.query(
+            'SELECT * FROM clients WHERE id = $1 AND user_id = $2',
+            [clientId, req.user.userId]
+        );
+
+        if (checkOwnership.rows.length === 0) {
+            return res.status(404).json({ error: 'Client not found or access denied.' });
+        }
+
+        // 2. First, delete all tasks for this client (Cleanup)
+        await client.query('DELETE FROM tasks WHERE client_id = $1', [clientId]);
+
+        // 3. Now it is safe to delete the client
+        await client.query('DELETE FROM clients WHERE id = $1', [clientId]);
+
+        res.json({ message: 'Client and all associated tasks deleted.' });
+
+    } catch (error) {
+        console.error('Error deleting client:', error);
+        res.status(500).json({ error: 'Server error during deletion.' });
+    }
+});
+
 module.exports = router;
