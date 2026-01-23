@@ -5,13 +5,13 @@
 ![Project Status](https://img.shields.io/badge/Status-MVP%20Complete-success)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
-## 📖 Project Overview
+##  Project Overview
 
 This project is a **Relational CRM & Task Manager** designed to solve the specific pain points of accountants: security risks on shared computers, deadline fragmentation, and "feature bloat" in generic tools.
 
 Unlike a standard To-Do list, this application links every task to a specific **Client Profile** in a relational database, ensuring that work is always organized by customer account.
 
-### 🚀 Key Features
+###  Key Features
 
 * **Client-Centric Workflow**: Tasks are relationally linked to clients, allowing for instant "per-client" status filtering.
 * **Session-Locked Security**: Custom authentication middleware ensures user sessions are cleared immediately upon tab closure to prevent unauthorized access on shared devices.
@@ -27,7 +27,7 @@ This project was built with a **"Performance First"** approach, utilizing Vanill
 * **Database**: PostgreSQL (Relational Data Models).
 * **Security**: JSON Web Tokens (JWT), bcrypt encryption, `sessionStorage` management.
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
 Prerequisites: Node.js and PostgreSQL installed locally.
 
@@ -62,7 +62,7 @@ Prerequisites: Node.js and PostgreSQL installed locally.
     ```
     Access the app at `http://localhost:3000`.
 
-## 🧩 Architecture
+##  Architecture
 
 The application follows a clean MVC-style architecture:
 
@@ -71,12 +71,12 @@ The application follows a clean MVC-style architecture:
 * **`public/js/`**: Frontend logic files (`dashboard.js`, `clients.js`) that handle DOM manipulation and API fetching.
 * **`middleware/auth.js`**: "Gatekeeper" script that verifies JWT tokens before allowing access to protected routes.
 
-## 🚧 Challenges & "Real Talk"
+##  Challenges & "Real Talk"
 
 * **State Management**: Syncing the UI with the PostgreSQL database using only Vanilla JS required writing custom DOM-diffing logic to update the task list without refreshing the page.
 * **Security Trade-offs**: I chose to use `sessionStorage` instead of `localStorage`. This means users must log in every time they open a new tab, but it guarantees higher security for financial data.
 
-## 🔮 Future Roadmap
+##  Future Roadmap
 
 * [ ] Cloud Deployment (Vercel/Render).
 * [ ] Mobile-responsive optimizations for the "Client Details" view.
